@@ -3,11 +3,15 @@ package study.jwt.util;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import study.jwt.entity.UserRole;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
@@ -16,11 +20,14 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
+    //Authorization Header key 값
+    public final static String AUTHORIZATION_HEADER = "authorization";
+
     //JWT 사용시 관례
-    private final static String BEARER_PREFIX = "Bearer ";
+    public final static String BEARER_PREFIX = "Bearer ";
 
     //JWT 만료 시간
-    private final static Long EXPIRATION_TIME = 60 * 60 * 1000L;
+    public final static Long EXPIRATION_TIME = 60 * 60 * 1000L;
 
     //JWT 디코딩 된 Secret Key
     private final Key secretKey;
@@ -45,7 +52,23 @@ public class JwtUtil {
                         .compact(); //JWT 문자열 형태로 최종 반환
     }
 
+    /* JWT -> Cookie 저장 */
+    public void addJwtToCookie(String token, HttpServletResponse response) {
+        try {
+            //Cookie : 공백이 없어야함 : 공백을 %20으로 인코딩
+            token = URLEncoder.encode(token, "utf-8").replace("\\+", "%20");
+
+            Cookie cookie = new Cookie(AUTHORIZATION_HEADER, token);
+            cookie.setPath("/"); //Cookie 를 받을 경로 지정
+
+            response.addCookie(cookie); // response -> 생성한 Cookie 추가
+        } catch (UnsupportedEncodingException e) {
+            log.error("쿠키 인코딩 예외={}", e.getMessage(), e);
+        }
+    }
+
     /* JWT 검증*/
+
     /* JWT SubString 추출*/
 
 }
