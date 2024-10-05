@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import study.jwt.entity.UserRole;
 
 import java.io.UnsupportedEncodingException;
@@ -67,8 +68,23 @@ public class JwtUtil {
         }
     }
 
-    /* JWT 검증*/
-
     /* JWT SubString 추출*/
+    public Long extractSubstring(String token) {
+        if (!StringUtils.hasText(token)) {
+            log.error("빈 토큰={}", token);
+            throw new IllegalStateException("Not Found Token");
+        }
+
+        if (!token.startsWith(BEARER_PREFIX)) {
+            log.error("Bearer 로 시작하지 않음={}", token);
+            throw new IllegalStateException("Not Start Bearer");
+        }
+
+        return Long.valueOf(token.substring(7));
+    }
+
+
+    /* JWT 검증 */
+
 
 }
