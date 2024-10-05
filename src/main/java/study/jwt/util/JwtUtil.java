@@ -33,7 +33,18 @@ public class JwtUtil {
         this.secretKey = Keys.hmacShaKeyFor(decodeSecretKey);
     }
 
-    /* JWT 생성*/
+    /* JWT 생성 */
+    public String createToken(Long userId, UserRole role) {
+        return BEARER_PREFIX +
+                Jwts.builder()
+                        .setSubject(String.valueOf(userId)) //JWT 주체 설정
+                        .claim("role", role) //JWT 에 담을 추가 정보
+                        .setIssuedAt(new Date()) //발급일
+                        .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) //만료일
+                        .signWith(secretKey, SignatureAlgorithm.HS256) // 암호화 알고리즘
+                        .compact(); //JWT 문자열 형태로 최종 반환
+    }
+
     /* JWT 검증*/
     /* JWT SubString 추출*/
 
